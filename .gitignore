@@ -27,3 +27,8 @@
 *.exe
 *.out
 *.app
+
+*.csv
+*.o
+.c9
+.vscode
