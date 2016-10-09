@@ -1,0 +1,11 @@
+#include <cstdio>
+#include <iostream>
+#include <time.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+#include <fstream>
+#include <math.h>
+#include "dataReader.hpp"
+#include "LSTM.hpp"
