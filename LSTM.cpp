@@ -58,3 +58,18 @@ void LSTM::setNextLayer(LSTM* next) {
 void LSTM::setPrevLayer(LSTM* prev) {
     this->prevLayer = prev;
 }
+LSTM* LSTM::getPrevNodeInLine() {
+    return this->prevInLine;
+}
+
+LSTM* LSTM::getNextNodeInLine() {
+    return this->nextInLine;
+}
+
+LSTM* LSTM::getNextLayer() {
+    return this->nextLayer;
+}
+
+LSTM* LSTM::getPrevLayer() {
+    return this->prevLayer;
+}

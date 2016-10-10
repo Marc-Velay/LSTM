@@ -26,8 +26,12 @@ class LSTM{
         //setters
         void setPrevNodeInLine(LSTM *prev);
         void setPrevLayer(LSTM *prev);
-        void setNextLayer(LSTM* next);
+        void setNextLayer(LSTM *next);
         void setNextNodeInLine(LSTM *next);
+        LSTM* getPrevNodeInLine();
+        LSTM* getPrevLayer();
+        LSTM* getNextLayer();
+        LSTM* getNextNodeInLine();
         
     private:
         LSTM *prevInLine, *nextInLine, * prevLayer, *nextLayer;

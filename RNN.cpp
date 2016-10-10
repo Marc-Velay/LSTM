@@ -3,25 +3,31 @@
 //Constructeur
 RNN::RNN(int size, int *sizeLayers) : seed (NULL), learningRate (LEARNING_RATE), momentum (MOMENTUM), epoch (0), maxEpochs (MAX_EPOCHS), desiredAccuracy (DESIRED_ACCURACY), trainingSetAccuracy(0), validationSetAccuracy(0), generalizationSetAccuracy(0), trainingSetMSE(0), validationSetMSE(0),generalizationSetMSE(0)
 {
-    LSTM *current, *prevLine, *prevNode;
+    LSTM *current, *prevLine, *prevNode, *firstInLine;
     seed = new LSTM();
     prevNode=seed;
     for(int i =0; i < sizeLayers[0]-1;++i){                                     //First Line
         current=new LSTM();
-        current->setPrevLayer(NULL);
-        prevNode->setNextNodeInLine(current);
+        prevNode->setNextNodeInLine(current);                                   //Create back and forth links
         current->setPrevNodeInLine(prevNode);
     }
-    current->setNextNodeInLine(NULL);
-    prevLine=current;
-    for(int i = 1; i<size; ++i){
+    firstInLine=current;
+    for(int i = 1; i<size; ++i){                                                // Create the n layers after the first one
+        prevLine=current;
         current= new LSTM();
-        current->setNextLayer(NULL);
         current->setPrevLayer(prevLine);
         prevLine->setNextLayer(current);
+        firstInLine=current;
         prevNode=current;
-        for(int j = sizeLayers[i]; j > sizeLayers[0]-sizeLayers[i]; j-- ){
-            
+        for(int j = 1; j< sizeLayers[i];++j){
+            current = new LSTM();
+            current->setNextNodeInLine(prevLine);
+            prevLine->setPrevNodeInLine(current);
+            if(current->nextInLine->prevLayer!=NULL){
+                current->setPrevLayer(current->nextInLine->prevLayer->prevInLine);
+                if(current->prevLayer!=NULL)
+                    current->prevLayer->setNextLayer(current);
+            }
         }
     }
 }
