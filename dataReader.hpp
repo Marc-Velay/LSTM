@@ -83,4 +83,5 @@ private:
 	void createStaticDataSet();
 	void processLine( std::string &line );
     size_t strcpy_s(char *d, size_t n, char const *s);	
+	int ASCIItranslate(char ch);
 };

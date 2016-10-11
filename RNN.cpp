@@ -157,7 +157,7 @@ int main(void) {
     srand( (unsigned int) time(0) );
 
     dataReader d;
-    d.loadDataFile("k-meansData.csv",2,1);
+    d.loadDataFile("text.csv", 1, 1);
     d.setCreationApproach();
     int layersSize[3] = {10, 5, 2};
     //create neural network

@@ -34,7 +34,7 @@ class LSTM{
         LSTM* getNextNodeInLine();
         
     private:
-        LSTM *prevInLine, *nextInLine, * prevLayer, *nextLayer;
+        LSTM *prevInLine, *nextInLine, *prevLayer, *nextLayer;
         double netInput, inputGateValue, forgetGateValue, actualInput, memory, core, outputeGateValue, coreActivationValue, output;
         
         double f (double sum);
@@ -44,5 +44,20 @@ class LSTM{
         void setActualInput(double netInput, double inputGateValue);
         void setMemory(double forgetGateValue, double core);
         void setOutputValue(double coreActivationValue, double outputeGateValue);
+        void setNetInput(double lastLayerOutput, double lastInLineOutput);
+        void setinputGateValue(double lastLayerOutput, double lastInLineOutput, double lastInLineCore);
+        void setForgetgateValue(double lastLayerOutput, double lastInLineOutput, double lastInLineCore);
+        void setOutputGateValue(double lastLayerOutput, double lastInLineOutput, double core);
+        void setCoreActivationValue(double coreValue);
+
+        double getCoreValue();
+        double getActualInput();
+        double getMemory();
+        double getOutputValue();
+        double getNetInput();
+        double getinputGateValue();
+        double getForgetgateValue();
+        double getOutputGateValue();
+        double getCoreActivationValue();
     
 };

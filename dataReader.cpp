@@ -98,9 +98,9 @@ void dataReader::processLine( string &line )
 	
 	while ( t!=NULL && i < (nInputs + nTargets) )
 	{	
-		if ( i < nInputs ) pattern[i] = atof(t);
-		else target[i - nInputs] = atof(t);
-
+		if ( i < nInputs ) pattern[i] = dataReader::ASCIItranslate(t[0]);
+		else target[i - nInputs] = dataReader::ASCIItranslate(t[0]);
+		cout << t << endl;
 		//move token forward
 		t = strtok_r(NULL,",", &nextToken );
 		i++;			
@@ -122,6 +122,11 @@ void dataReader::processLine( string &line )
 
 	//add to records
 	data.push_back( new dataEntry( pattern, target ) );		
+}
+
+
+int dataReader::ASCIItranslate(char ch) {
+    return static_cast<int>(ch);
 }
 //Selects the data set creation approach
 void dataReader::setCreationApproach()
