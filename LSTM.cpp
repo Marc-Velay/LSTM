@@ -3,13 +3,34 @@
 //Constructeur
 LSTM::LSTM(): prevInLine(NULL), nextInLine(NULL), prevLayer(NULL), nextLayer(NULL)
 {
-    
+    coreVector = new double[VOCABSIZE];
+    outputVector = new double[VOCABSIZE];
+    for(int i = 0; i < VOCABSIZE; i++) {
+      coreVector[i]=0;
+      outputVector[i]=0;
+    }
 }
 
 //Destructeur
 LSTM::~LSTM() {
-    
+    delete[] coreVector;
+    delete[] outputVector;
+    if(nextInLine!=NULL)
+      nextInLine->~LSTM();
+    myTinyFree(this);
 }
+
+void LSTM::myTinyFree(LSTM* seed){
+  if(seed->prevInLine!=NULL)
+      myTinyFree(seed->prevInLine);
+  free(seed);
+}
+
+
+void LSTM::activate(LSTM* end,double* pattern){
+ 
+}
+
 
 //Methode
 double LSTM::f(double sum){
@@ -24,24 +45,14 @@ double LSTM::h(double sum){
     return (2/(1 + exp(-sum))- 1);
 }
 
-void  LSTM::setCoreValue() {
-    this->core = this->actualInput + this->memory;
+void  LSTM::setCoreVector() {
+    
+    //this->coreVector = this->actualInput + this->memory;
 }
         
-void  LSTM::setActualInput(double netInput, double inputGateValue) {
-    this->actualInput = netInput*inputGateValue;
+void  LSTM::setoutputVector() {
+    //this->actualInput = netInput*inputGateValue;
 }
-
-
-void  LSTM::setMemory(double forgetGateValue, double previousCore) {
-    this->memory = forgetGateValue*previousCore;
-}
-
-
-void  LSTM::setOutputValue(double coreActivationValue, double outputeGateValue) {
-    this->output = coreActivationValue*outputeGateValue;
-}
-
 
 void LSTM::setPrevNodeInLine(LSTM *prev) {
     this->prevInLine = prev;
@@ -72,4 +83,12 @@ LSTM* LSTM::getNextLayer() {
 
 LSTM* LSTM::getPrevLayer() {
     return this->prevLayer;
+}
+
+double* LSTM::getCoreVector(){
+    return this->coreVector;
+}
+
+double* getOutputVector() {
+    return this->outputVector;
 }

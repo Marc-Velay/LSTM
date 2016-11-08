@@ -13,8 +13,6 @@ size_t dataReader::strcpy_s(char *d, size_t n, char const *s)
     return snprintf(d, n, "%s", s);
 }
 
-
-
 dataReader::~dataReader()
 {
 	//clear data
@@ -23,16 +21,12 @@ dataReader::~dataReader()
 }
 
 
-bool dataReader::loadDataFile( const char* filename, int nI, int nT )
+bool dataReader::loadDataFile( const char* filename)
 {
 	//clear any previous data
 	for (int i=0; i < (int) data.size(); i++ ) delete data[i];		
 	data.clear();
 	tSet.clear();
-	
-	//set number of inputs and outputs
-	nInputs = nI;
-	nTargets = nT;
 
 	//open file for reading
 	fstream inputFile;
@@ -45,25 +39,30 @@ bool dataReader::loadDataFile( const char* filename, int nI, int nT )
 		//read data
 		while ( !inputFile.eof() )
 		{
-			getline(inputFile, line);				
+			getline(inputFile, line);
 			
 			//process line
-			if (line.length() > 2 ) processLine(line);
+			if (line.length() > 0 ) processLine(line);
 		}		
 		
 		//shuffle data
-		random_shuffle(data.begin(), data.end());
+		//random_shuffle(data.begin(), data.end());
 
 		//split data set
-		trainingDataEndIndex = (int) ( 0.6 * data.size() );
-		int gSize = (int) ( ceil(0.2 * data.size()) );
+		//trainingDataEndIndex = (int) ( 0.6 * data.size() );
+		trainingDataEndIndex = (int) ( data.size() );
+		//int gSize = (int) ( ceil(0.2 * data.size()) );
+		int gSize = (int) ( data.size() );
 		//int vSize = (int) ( data.size() - trainingDataEndIndex - gSize );
+		int vSize = (int) ( data.size() );
 							
 		//generalization set
-		for ( int i = trainingDataEndIndex; i < trainingDataEndIndex + gSize; i++ ) tSet.generalizationSet.push_back( data[i] );
+		//for ( int i = trainingDataEndIndex; i < trainingDataEndIndex + gSize; i++ ) tSet.generalizationSet.push_back( data[i] );
+		for ( int i = 0; i < trainingDataEndIndex; i++ ) tSet.generalizationSet.push_back( data[i] );
 				
 		//validation set
-		for ( int i = trainingDataEndIndex + gSize; i < (int) data.size(); i++ ) tSet.validationSet.push_back( data[i] );
+		//for ( int i = trainingDataEndIndex + gSize; i < (int) data.size(); i++ ) tSet.validationSet.push_back( data[i] );
+		for ( int i = 0; i < (int) data.size(); i++ ) tSet.validationSet.push_back( data[i] );
 		
 		//print success
 		cout << "Input File: " << filename << "\nRead Complete: " << data.size() << " Patterns Loaded"  << endl;
@@ -83,50 +82,19 @@ bool dataReader::loadDataFile( const char* filename, int nI, int nT )
 //Processes a single line from the data file
 void dataReader::processLine( string &line )
 {
-	//create new pattern and target
-	double* pattern = new double[nInputs];
-	double* target = new double[nTargets];
-	
-	//store inputs		
-	char* cstr = new char[line.size()+1];
-	char* t;
-	dataReader::strcpy_s(cstr, line.size() + 1, line.c_str());
-
-	int i = 0;
-    char* nextToken = NULL;
-	t=strtok_r(cstr, ",", &nextToken );
-	
-	while ( t!=NULL && i < (nInputs + nTargets) )
-	{	
-		if ( i < nInputs ) pattern[i] = dataReader::ASCIItranslate(t[0]);
-		else target[i - nInputs] = dataReader::ASCIItranslate(t[0]);
-		cout << t << endl;
-		//move token forward
-		t = strtok_r(NULL,",", &nextToken );
-		i++;			
+	for(int i = 0; i < int(line.length()-1); i++) {
+		data.push_back( new dataEntry( dataReader::toClass(line.at(i)), dataReader::toClass(line.at(i+1))) );
+		cout << line.at(i);
 	}
-	
-	cout << "pattern: ";
-	for (int i=0; i < nInputs; i++) 
-	{
-		cout << pattern[i] << ",";
-	}
-	
-	cout << " target: ";
-	for (int i=0; i < nTargets; i++) 
-	{
-		cout << target[i] << " ";
-	}
-	cout << endl;
+	data.push_back( new dataEntry( dataReader::toClass(line.at(line.length()-1)), dataReader::toClass('.')));
+	cout << line.at(line.length()-1) << endl;
 
-
-	//add to records
-	data.push_back( new dataEntry( pattern, target ) );		
-}
-
-
-int dataReader::ASCIItranslate(char ch) {
-    return static_cast<int>(ch);
+	for(int i = 0; i < int(data.size()); i++) {
+		for(int j = 0; j < int(classList.length()); j++) {
+			cout << data[i]->pattern[j];
+			cout << ", " << data[i]->target[j] << endl;
+		}
+	}	
 }
 //Selects the data set creation approach
 void dataReader::setCreationApproach()
@@ -138,6 +106,18 @@ void dataReader::setCreationApproach()
 
 }
 
+double* dataReader::toClass(char t) {
+	string classList = "abcdefghijklmnopqrstuvwxyz ,.!?";
+	double* outputVector = new double[classList.length()+1];
+	for(int i = 0; i < int(classList.length()); i++) {
+		if(t == classList.at(i)) {
+			outputVector[i] = 1;
+		} else {
+			outputVector[i] = 0;
+		}
+	}
+	return outputVector;
+}
 
 
 //Returns number of data sets created by creation approach

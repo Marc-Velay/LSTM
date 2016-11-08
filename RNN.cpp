@@ -1,5 +1,5 @@
 #include "RNN.hpp"
-
+	
 //Constructeur
 RNN::RNN(int size, int *sizeLayers) : seed (NULL), learningRate (LEARNING_RATE), momentum (MOMENTUM), epoch (0), maxEpochs (MAX_EPOCHS), desiredAccuracy (DESIRED_ACCURACY), trainingSetAccuracy(0), validationSetAccuracy(0), generalizationSetAccuracy(0), trainingSetMSE(0), validationSetMSE(0),generalizationSetMSE(0)
 {
@@ -13,27 +13,48 @@ RNN::RNN(int size, int *sizeLayers) : seed (NULL), learningRate (LEARNING_RATE),
     }
     firstInLine=current;
     for(int i = 1; i<size; ++i){                                                // Create the n layers after the first one
-        prevL=current;
-        current= new LSTM();
-        current->setPrevLayer(prevL);
-        prevL->setNextLayer(current);
-        firstInLine=current;
-        prevNode=current;
-        for(int j = 1; j< sizeLayers[i];++j){
-            current = new LSTM();
-            current->setNextNodeInLine(prevL);
-            prevL->setPrevNodeInLine(current);
-            if(current->getNextNodeInLine()->getPrevLayer()!=NULL){
-                current->setPrevLayer(current->getNextNodeInLine()->getPrevLayer()->getPrevNodeInLine());
-                if(current->getPrevLayer()!=NULL)
-                    current->getPrevLayer()->setNextLayer(current);
-            }
-        }
+ 			if(sizeLayers[i-1]<sizeLayers[i])
+				prevL=firstInLine;
+				current= new LSTM();
+				current->setPrevLayer(prevL);
+				prevL->setNextLayer(current);
+				firstInLine=current;
+				for(int j = 1; j< sizeLayers[i];++j){
+						prevNode=current;
+						current = new LSTM();
+						current->setNextNodeInLine(prevNode);
+						prevNode->setPrevNodeInLine(current);
+						if(current->getNextNodeInLine()->getPrevLayer()!=NULL){
+							current->setPrevLayer(current->getNextNodeInLine()->getPrevLayer()->getPrevNodeInLine());
+							if(current->getPrevLayer()!=NULL)
+								current->getPrevLayer()->setNextLayer(current);
+							}
+						}
+			else{
+				while(current->getPrevNodeInLine()!=NULL)
+					current=current->getPrevNodeInLine();
+				prevL=current;
+				current= new LSTM();
+				current->setPrevLayer(prevL);
+				prevL->setNextLayer(current);
+				for(int j = 1; j< sizeLayers[i];++j){
+					if(prevNode!=NULL)
+						prevNode=prevNode->getNextNodeInLine();
+					prevNode=current;
+					current=new LSTM();
+					current->setPrevNodeInLine(prevNode);
+					prevNode->setNextNodeInLine(current);
+					current->setPrevLayer(prevNode);
+				}
+			}
     }
 }
 
 RNN::~RNN() {
-    
+		LSTM* aux = seed;
+		while(aux->getNextNodeInLine()!=NULL)
+			aux=aux->getNextNodeInLine();
+		aux->~LSTM();
 }
 
 
@@ -143,9 +164,23 @@ void RNN::updateWeights() {
 
 
 void RNN::feedForward( double* pattern ) {
-    
+	cout<<"MEH MEH \n\n"<<endl;
+	LSTM* current = seed;
+	LSTM* nextbegin =NULL;
+	boolean isNextLayer = true;
+	while(isNextLayer){
+		while(current!=NULL) {
+			if(nextbegin==NULL && current->getNextLayer()!=NULL)
+				nextbegin=current->getNextLayer();
+			current->activation(); 																		//penser a modifier le paramètre d'entrée en fonction du type d'entrée
+			current=current->getNextNodeInLine();
+		}
+		isNextLayer=!(nextbegin==NULL);
+		nextbegin=NULL;
+	}
+	
+	
 }
-
 
 int RNN::clampOutput( double x ) {
         if( x < 0.1 ) return 0;
@@ -157,7 +192,7 @@ int main(void) {
     srand( (unsigned int) time(0) );
 
     dataReader d;
-    d.loadDataFile("text.csv", 1, 1);
+    d.loadDataFile("k-meansData.csv");
     d.setCreationApproach();
     int layersSize[3] = {10, 5, 2};
     //create neural network

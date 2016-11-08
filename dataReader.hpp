@@ -44,6 +44,9 @@ enum { NONE, STATIC};
 class dataReader
 {
 	
+public:
+	std::string classList;
+	
 //private members
 //----------------------------------------------------------------------------------------------------------------
 private:
@@ -51,7 +54,6 @@ private:
 	//data storage
 	std::vector<dataEntry*> data;
 	int nInputs;
-	int nTargets;
 
 	//current data set
 	trainingDataSet tSet;
@@ -69,7 +71,7 @@ public:
 	dataReader(): creationApproach(NONE), numTrainingSets(-1) {}
 	~dataReader();
 	
-	bool loadDataFile( const char* filename, int nI, int nT );
+	bool loadDataFile( const char* filename);
 	void setCreationApproach();
 	int getNumTrainingSets();
 	
@@ -82,6 +84,6 @@ private:
 	
 	void createStaticDataSet();
 	void processLine( std::string &line );
-    size_t strcpy_s(char *d, size_t n, char const *s);	
-	int ASCIItranslate(char ch);
+	double* toClass(char t);
+  size_t strcpy_s(char *d, size_t n, char const *s);	
 };

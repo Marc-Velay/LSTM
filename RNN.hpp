@@ -42,23 +42,24 @@ class RNN {
     
     public:
     //Constructeur
-        RNN(int size, int* layersSize);
-        ~RNN();
-    	void setTrainingParameters( double lR, double m);
-    	void setStoppingConditions( int mEpochs, double dAccuracy);
-    	void enableLogging( const char* filename, int resolution );
-    	void trainNetwork( trainingDataSet* tSet );
+      RNN(int size, int* layersSize);
+      ~RNN();
+    	void setTrainingParameters(double lR, double m);
+    	void setStoppingConditions(int mEpochs, double dAccuracy);
+    	void enableLogging(const char* filename, int resolution);
+    	void trainNetwork(trainingDataSet* tSet);
     	
     	bool loadWeights(char* inputFilename);
-        bool saveWeights(char* outputFilename);
-        int* feedForwardPattern( double* pattern );
-        double getSetAccuracy( std::vector<dataEntry*>& set );
-        double getSetMSE( std::vector<dataEntry*>& set );
+      bool saveWeights(char* outputFilename);
+      int* feedForwardPattern(double* pattern);
+      double getSetAccuracy(std::vector<dataEntry*>& set);
+      double getSetMSE(std::vector<dataEntry*>& set);
     	
     private:
-    	void runTrainingEpoch( std::vector<dataEntry*> trainingSet );
+			double sigmoid(double x);
+    	void runTrainingEpoch(std::vector<dataEntry*> trainingSet);
     	void backpropagate(double* desiredOutputs);
     	void updateWeights();
-    	int clampOutput( double x );
-        void feedForward( double* pattern );
+    	int clampOutput(double x);
+      void feedForward(double* pattern);
 };
