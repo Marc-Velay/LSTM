@@ -12,6 +12,8 @@
 
 using namespace std;
 
+#define VOCABSIZE 31 //[a..z],.!? <space>
+
 class RNN {
     
     LSTM* seed;
@@ -50,16 +52,16 @@ class RNN {
     	void trainNetwork(trainingDataSet* tSet);
     	
     	bool loadWeights(char* inputFilename);
-      bool saveWeights(char* outputFilename);
-      int* feedForwardPattern(double* pattern);
-      double getSetAccuracy(std::vector<dataEntry*>& set);
-      double getSetMSE(std::vector<dataEntry*>& set);
+		bool saveWeights(char* outputFilename);
+		int* feedForwardPattern(vector<double> pattern);
+		double getSetAccuracy(std::vector<dataEntry*>& set);
+		double getSetMSE(std::vector<dataEntry*>& set);
     	
     private:
-			double sigmoid(double x);
+		double sigmoid(double x);
     	void runTrainingEpoch(std::vector<dataEntry*> trainingSet);
-    	void backpropagate(double* desiredOutputs);
+    	void backpropagate(vector<double> desiredOutputs);
     	void updateWeights();
     	int clampOutput(double x);
-      void feedForward(double* pattern);
+		void feedForward(vector<double> pattern);
 };

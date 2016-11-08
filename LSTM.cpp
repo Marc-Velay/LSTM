@@ -3,18 +3,18 @@
 //Constructeur
 LSTM::LSTM(): prevInLine(NULL), nextInLine(NULL), prevLayer(NULL), nextLayer(NULL)
 {
-    coreVector = new double[VOCABSIZE];
-    outputVector = new double[VOCABSIZE];
+    coreVector.reserve(VOCABSIZE);
+    outputVector.reserve(VOCABSIZE);
+    prevLayerOutput.reserve(VOCABSIZE);
     for(int i = 0; i < VOCABSIZE; i++) {
-      coreVector[i]=0;
-      outputVector[i]=0;
+      coreVector.push_back(0);
+      outputVector.push_back(0);
+      prevLayerOutput.push_back(0);
     }
 }
 
 //Destructeur
 LSTM::~LSTM() {
-    delete[] coreVector;
-    delete[] outputVector;
     if(nextInLine!=NULL)
       nextInLine->~LSTM();
     myTinyFree(this);
@@ -27,8 +27,8 @@ void LSTM::myTinyFree(LSTM* seed){
 }
 
 
-void LSTM::activate(LSTM* end,double* pattern){
- 
+void LSTM::activate(){
+
 }
 
 
@@ -45,13 +45,41 @@ double LSTM::h(double sum){
     return (2/(1 + exp(-sum))- 1);
 }
 
-void  LSTM::setCoreVector() {
-    
-    //this->coreVector = this->actualInput + this->memory;
+vector<double> LSTM::sigmoidFct(vector<double> input) {
+    if(input.size() != 0) {
+        for(int i = 0; i < (int)input.size(); i++) {
+            input[i] = 1/(1+exp(-input[i]));
+        }
+    }
+    return input;
+}
+
+vector<double> LSTM::tanhFct(vector<double> input) {
+    if(input.size() != 0) {
+        for(int i = 0; i < (int)input.size(); i++) {
+            input[i] = (exp(input[i])-exp(-input[i]))/(exp(input[i])+exp(-input[i]));
+        }
+    }
+    return input;
+}
+
+vector<double> LSTM::sumVectors(vector<double> vector1, vector<double> vector2) {
+    for(int i =0; i < (int)vector1.size(); i++){
+        vector1[i] = vector1[i]+vector2[i];
+    }
+    return vector1;
+}
+
+void  LSTM::setCoreVector(vector<double> coreVector) {    
+    this->coreVector = coreVector;
 }
         
-void  LSTM::setoutputVector() {
-    //this->actualInput = netInput*inputGateValue;
+void  LSTM::setoutputVector(vector<double> outputVector) {
+    this->outputVector = outputVector;
+}
+        
+void  LSTM::setprevLayerOutput(vector<double> prevLayerOutput) {
+    this->prevLayerOutput = prevLayerOutput;
 }
 
 void LSTM::setPrevNodeInLine(LSTM *prev) {
@@ -69,6 +97,7 @@ void LSTM::setNextLayer(LSTM* next) {
 void LSTM::setPrevLayer(LSTM* prev) {
     this->prevLayer = prev;
 }
+
 LSTM* LSTM::getPrevNodeInLine() {
     return this->prevInLine;
 }
@@ -85,10 +114,14 @@ LSTM* LSTM::getPrevLayer() {
     return this->prevLayer;
 }
 
-double* LSTM::getCoreVector(){
+vector<double> LSTM::getCoreVector(){
     return this->coreVector;
 }
 
-double* getOutputVector() {
+vector<double> LSTM::getOutputVector() {
     return this->outputVector;
+}
+
+vector<double> LSTM::getprevLayerOutput() {
+    return this->prevLayerOutput;
 }

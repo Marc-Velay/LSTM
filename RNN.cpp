@@ -4,6 +4,10 @@
 RNN::RNN(int size, int *sizeLayers) : seed (NULL), learningRate (LEARNING_RATE), momentum (MOMENTUM), epoch (0), maxEpochs (MAX_EPOCHS), desiredAccuracy (DESIRED_ACCURACY), trainingSetAccuracy(0), validationSetAccuracy(0), generalizationSetAccuracy(0), trainingSetMSE(0), validationSetMSE(0),generalizationSetMSE(0)
 {
     LSTM *current, *prevL, *prevNode, *firstInLine;
+    vector<double> emptyVector(VOCABSIZE);
+    for(int i = 0; i < VOCABSIZE; i++) {
+        emptyVector.push_back(0);
+    }
     seed = new LSTM();
     prevNode=seed;
     for(int i =0; i < sizeLayers[0]-1;++i){                                     //First Line
@@ -13,7 +17,7 @@ RNN::RNN(int size, int *sizeLayers) : seed (NULL), learningRate (LEARNING_RATE),
     }
     firstInLine=current;
     for(int i = 1; i<size; ++i){                                                // Create the n layers after the first one
- 			if(sizeLayers[i-1]<sizeLayers[i])
+ 			if(sizeLayers[i-1]<sizeLayers[i]) {
 				prevL=firstInLine;
 				current= new LSTM();
 				current->setPrevLayer(prevL);
@@ -26,11 +30,12 @@ RNN::RNN(int size, int *sizeLayers) : seed (NULL), learningRate (LEARNING_RATE),
 						prevNode->setPrevNodeInLine(current);
 						if(current->getNextNodeInLine()->getPrevLayer()!=NULL){
 							current->setPrevLayer(current->getNextNodeInLine()->getPrevLayer()->getPrevNodeInLine());
-							if(current->getPrevLayer()!=NULL)
+							if(current->getPrevLayer()!=NULL){
 								current->getPrevLayer()->setNextLayer(current);
 							}
 						}
-			else{
+                }
+            }else{
 				while(current->getPrevNodeInLine()!=NULL)
 					current=current->getPrevNodeInLine();
 				prevL=current;
@@ -102,7 +107,7 @@ bool RNN::saveWeights(char* outputFilename) {
 }
 
 
-int* RNN::feedForwardPattern( double* pattern ) {
+int* RNN::feedForwardPattern( vector<double> pattern ) {
     feedForward(pattern);
     
     int* results = new int[0];
@@ -151,7 +156,7 @@ void RNN::runTrainingEpoch( std::vector<dataEntry*> trainingSet ) {
 }
 
 
-void RNN::backpropagate(double* desiredOutputs) {
+void RNN::backpropagate(vector<double> desiredOutputs) {
     
     
     updateWeights();
@@ -163,16 +168,16 @@ void RNN::updateWeights() {
 }
 
 
-void RNN::feedForward( double* pattern ) {
+void RNN::feedForward( vector<double> pattern ) {
 	cout<<"MEH MEH \n\n"<<endl;
 	LSTM* current = seed;
 	LSTM* nextbegin =NULL;
-	boolean isNextLayer = true;
+	bool isNextLayer = true;
 	while(isNextLayer){
 		while(current!=NULL) {
 			if(nextbegin==NULL && current->getNextLayer()!=NULL)
 				nextbegin=current->getNextLayer();
-			current->activation(); 																		//penser a modifier le paramètre d'entrée en fonction du type d'entrée
+			current->activate(); 																		//penser a modifier le paramètre d'entrée en fonction du type d'entrée
 			current=current->getNextNodeInLine();
 		}
 		isNextLayer=!(nextbegin==NULL);
